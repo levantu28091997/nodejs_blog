@@ -1,14 +1,11 @@
 const Cource = require('../models/Cource');
-const {
-    mongooseToObject,
-    mutipleMongooseToObject,
-} = require('../../util/mongooes');
+const { mutipleMongooseToObject } = require('../../util/mongooes');
 
-class SiteController {
-    async home(req, res, next) {
+class MeController {
+    async storedCources(req, res, next) {
         await Cource.find({})
             .then((cources) => {
-                res.render('home', {
+                res.render('me/stored-cources', {
                     cources: mutipleMongooseToObject(cources),
                 });
             })
@@ -18,4 +15,4 @@ class SiteController {
     }
 }
 
-module.exports = new SiteController();
+module.exports = new MeController();

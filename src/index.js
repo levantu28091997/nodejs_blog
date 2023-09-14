@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const { engine } = require('express-handlebars');
 const routes = require('./routes');
 const db = require('./config/db');
+const methodOverride = require('method-override');
 const app = express();
 const port = 3000;
 
@@ -20,9 +21,22 @@ app.use(express.json());
 db.connect();
 
 // handlebars template engine
-app.engine('hbs', engine({ extname: '.hbs' }));
+app.engine(
+    'hbs',
+    engine({
+        extname: '.hbs',
+        helpers: {
+            sum(a, b) {
+                return a + b;
+            },
+        },
+    }),
+);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'resources', 'views'));
+
+// Method Override
+app.use(methodOverride('_method'));
 
 // settup routes
 routes(app);
