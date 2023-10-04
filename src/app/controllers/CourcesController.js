@@ -6,15 +6,15 @@ const {
 
 class CourcesController {
     // [GET] /cources/create
-    async create(req, res, next) {
+    create(req, res, next) {
         res.render('cources/create');
     }
 
     // [POST] /cources/store
-    async store(req, res, next) {
-        const formData = req.body;
+    store(req, res, next) {
+        const formData = { ...req.body };
         formData.image = `https://i.ytimg.com/vi/${req.body.videoId}/hq720.jpg`;
-        const cource = new Cource(req.body);
+        const cource = new Cource(formData);
         cource
             .save()
             .then(() => {
@@ -27,8 +27,8 @@ class CourcesController {
     }
 
     // [GET] /cources/:slug
-    async show(req, res, next) {
-        await Cource.findOne({ slug: req.params.slug })
+    show(req, res, next) {
+        Cource.findOne({ slug: req.params.slug })
             .then((cource) => {
                 res.render('cources/detail', {
                     cource: mongooseToObject(cource),
@@ -40,8 +40,8 @@ class CourcesController {
     }
 
     // [GET] /cources/:id/edit
-    async edit(req, res, next) {
-        await Cource.findById(req.params.id)
+    edit(req, res, next) {
+        Cource.findById(req.params.id)
             .then((cource) => {
                 res.render('cources/edit', {
                     cource: mongooseToObject(cource),
@@ -53,14 +53,69 @@ class CourcesController {
     }
 
     // [PUT] /cources/:id
-    async update(req, res, next) {
-        await Cource.updateOne({ _id: req.params.id }, req.body)
+    update(req, res, next) {
+        Cource.updateOne({ _id: req.params.id }, req.body)
             .then(() => {
                 res.redirect('/me/stored/cources');
             })
             .catch((err) => {
                 next(err);
             });
+    }
+
+    // [DELETE] /cources/:id
+    destroy(req, res, next) {
+        Cource.delete({ _id: req.params.id })
+            .then(() => {
+                res.redirect('back');
+            })
+            .catch((err) => {
+                next(err);
+            });
+    }
+
+    // [PATCH] /cources/:id/restore
+    restore(req, res, next) {
+        console.log(req.params.id);
+        Cource.restore({ _id: req.params.id })
+            .then(() => {
+                res.redirect('back');
+            })
+            .catch((err) => {
+                next(err);
+            });
+    }
+
+    // [DELETE] /cources/:id/remove
+    remove(req, res, next) {
+        Cource.deleteOne({ _id: req.params.id })
+            .then(() => {
+                res.redirect('back');
+            })
+            .catch((err) => {
+                next(err);
+            });
+    }
+
+    // [POST] /cources/handle-form-action
+    handleFormAction(req, res, next) {
+        console.log(req.body.courcesId);
+        switch (req.body.action) {
+            case 'delete':
+                Cource.delete({ _id: { $in: req.body.courcesId } })
+                    .then(() => {
+                        res.redirect('back');
+                    })
+                    .catch((err) => {
+                        next(err);
+                    });
+
+                break;
+
+            default:
+                res.json('successfull!');
+                break;
+        }
     }
 }
 
