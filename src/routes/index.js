@@ -1,15 +1,8 @@
-const newsRoutes = require('./news');
-const searchRoutes = require('./search');
-const courcesRoutes = require('./cources');
-const meRoutes = require('./me');
-const siteRoutes = require('./site');
+const express = require('express');
+const router = express.Router();
+const homeController = require('../app/controllers/HomeController');
 
-function routes(app) {
-    app.use('/news', newsRoutes);
-    app.use('/search', searchRoutes);
-    app.use('/cources', courcesRoutes);
-    app.use('/me', meRoutes);
-    app.use('/', siteRoutes);
-}
+// Define routes
+router.get('/', homeController.home);
 
-module.exports = routes;
+module.exports = router;
